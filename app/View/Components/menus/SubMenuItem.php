@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\menus;
+namespace App\View\Components\Menus;
 
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -15,10 +15,10 @@ class SubMenuItem extends Component
         public string $content = 'Submenu Item',
         public string $href = '#',
         public bool $selectable = true,
-        public bool $selected = false
+        public bool $selected = false,
+        public string $form = '',
     )
     {
-        //
     }
 
     /**

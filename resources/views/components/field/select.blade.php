@@ -1,13 +1,3 @@
-{{--
-    NOTE: we've used the match to define multiple versions of width class,
-    to ensure that all specific width related classes are defined statically
-    on the source code - this guarantees that the Tailwind builder
-    detects the corresponding class.
-    If we had used dynamically generated classes (e.g. "w-{{ $width }}") then
-the builder would not detect concrete values.
-Check documentation about dynamic classes:
-https://tailwindcss.com/docs/content-configuration#dynamic-class-names
---}}
 @php
 $widthClass = match($width) {
 'full' => 'w-full',
@@ -29,9 +19,6 @@ $widthClass = match($width) {
 $selectedValue = array_key_exists($value, $options) ? $value : $defaultValue;
 @endphp
 <div {{ $attributes->merge(['class' => "$widthClass"]) }}>
-    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300" for="id_{{ $name }}">
-        {{ $label }}
-    </label>
     <select id="id_{{ $name }}" name="{{ $name }}" class="appearance-none block
             mt-1 w-full
             bg-white dark:bg-gray-900

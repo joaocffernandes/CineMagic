@@ -52,29 +52,44 @@
                         </x-menus.submenu>
 
                         <div class="grow"></div>
-
+                        @auth
                         <!-- Menu Item: Cart -->
                         <x-menus.cart href="#" selectable="0" selected="1" total="2" />
 
                         <x-menus.submenu selectable="0" uniqueName="submenu_user">
                             <x-slot:content>
                                 <div class="pe-1">
-                                    <img src="{{ Vite::asset('resources/img/photos/default.png') }}" class="w-11 h-11 min-w-11 min-h-11 rounded-full">
+                                    @php
+                                    $userImage = Auth::user()->PhotoFullUrl;
+                                    @endphp
+                                    <img src="{{ asset($userImage) }}" class="w-11 h-11 min-w-11 min-h-11 rounded-full">
                                 </div>
                                 {{-- ATENÇÃO - ALTERAR FORMULA DE CALCULO DAS LARGURAS MÁXIMAS QUANDO O MENU FOR ALTERADO --}}
                                 <div class="ps-1 sm:max-w-[calc(100vw-39rem)] md:max-w-[calc(100vw-41rem)] lg:max-w-[calc(100vw-46rem)] xl:max-w-[34rem] truncate">
-                                    João Miguel da Silva Pereira Antunes
+                                    {{ Auth::user()->name }}
                                 </div>
                                 </x-slot>
-                                <x-menus.submenu-item content="My Disciplines" selectable="0" href="#" />
-                                <x-menus.submenu-item content="My Teachers" selectable="0" href="#" />
-                                <x-menus.submenu-item content="My Students" selectable="0" href="#" />
+                                <x-menus.submenu-item content="Profile" selectable="0" href="{{ route('profile.edit') }}" />
                                 <hr>
-                                <x-menus.submenu-item content="Profile" selectable="0" href="#" />
-                                <x-menus.submenu-item content="Change Password" selectable="0" href="#" />
-                                <hr>
-                                <x-menus.submenu-item content="Log Out" selectable="0" href="#" />
+                                <form id="form_to_logout_from_menu" method="POST" action="{{ route('logout') }}" class="hidden">
+                                    @csrf
+                                </form>
+                                <a class="px-3 py-4 border-b-2 border-transparent
+                                            text-sm font-medium leading-5 inline-flex h-auto
+                                            text-gray-500 dark:text-gray-400
+                                            hover:text-gray-700 dark:hover:text-gray-300
+                                            hover:bg-gray-100 dark:hover:bg-gray-800
+                                            focus:outline-none
+                                            focus:text-gray-700 dark:focus:text-gray-300
+                                            focus:bg-gray-100 dark:focus:bg-gray-800" href="#" onclick="event.preventDefault();
+                                            document.getElementById('form_to_logout_from_menu').submit();">
+                                    Log Out
+                                </a>
                         </x-menus.submenu>
+                        @else
+                        <!-- Menu Item: Login -->
+                        <x-menus.menu-item content="Login" selectable="1" href="{{ route('login') }}" selected="{{ Route::currentRouteName() == 'login'}}" />
+                        @endauth
                     </div>
                     <!-- Hamburger -->
                     <div class="absolute right-0 top-0 flex sm:hidden pt-3 pe-3 text-black dark:text-gray-50">

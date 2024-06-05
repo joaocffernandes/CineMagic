@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Genre;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         $allGenres = Genre::all();
         $options = $allGenres->pluck('name', 'code')->toArray();       
         View::share('genres', $options);
+        Gate::define('admin', function (User $user) {
+            // Only "administrator" users can "admin"
+            return $user->type;
+        });
     }
 }
