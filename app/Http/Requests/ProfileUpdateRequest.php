@@ -28,6 +28,24 @@ class ProfileUpdateRequest extends FormRequest
             ]);
         }
 
+        if ($this->input('payment_type') == 'MBWAY'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|regex:/^9\d{8}$/',
+            ]);
+        }
+
+        if ($this->input('payment_type') == 'PAYPAL'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|string|email|max:255',
+            ]);
+        }
+
+        if ($this->input('payment_type') == 'VISA'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|regex:/^4[0-9]{15}$/',
+            ]);
+        }
+
         return $rules;
     }
 }

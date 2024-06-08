@@ -26,23 +26,29 @@ $readonly = $mode == 'show';
                             <x-input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
 
-                        <div>
+                        <div class="mt-4">
                             <x-input-label for="email" :value="__('Email')" />
                             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
                             <x-input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
 
                         @if (Auth::user()->type == "C")
-                        <div>
+                        <div class="mt-4">
                             <x-input-label for="nif" :value="__('NIF')" />
                             <x-text-input id="nif" name="nif" type="text" class="mt-1 block w-full" :value="old('nif', $customer->nif)" required autofocus autocomplete="nif" />
                             <x-input-error class="mt-2" :messages="$errors->get('nif')" />
                         </div>
 
-                        <div>
+                        <div class="mt-4">
                             <x-input-label for="payment_type" :value="__('Tipo de Pagamento')" />
                             <x-field.select name="payment_type" id="payment_type" value="{{ old('payment_type', $customer->payment_type) }}" :options="['VISA' => 'VISA', 'PAYPAL' => 'PAYPAL', 'MBWAY' => 'MBWAY']" />
                             <x-input-error class="mt-2" :messages="$errors->get('payment_type')" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="payment_ref" :value="__('Referência')" />
+                            <x-text-input id="payment_ref" name="payment_ref" type="text" class="mt-1 block w-full" :value="old('payment_ref', $customer->payment_ref)" required autofocus autocomplete="payment_ref" />
+                            <x-input-error class="mt-2" :messages="$errors->get('payment_ref')" />
                         </div>
                         @endif
 

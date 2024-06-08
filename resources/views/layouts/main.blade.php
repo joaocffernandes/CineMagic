@@ -69,8 +69,10 @@
                                     {{ Auth::user()->name }}
                                 </div>
                                 </x-slot>
+                                @if (Auth::user()->type != 'E')
                                 <x-menus.submenu-item content="Profile" selectable="0" href="{{ route('profile.edit') }}" />
                                 <hr>
+                                @endif
                                 <form id="form_to_logout_from_menu" method="POST" action="{{ route('logout') }}" class="hidden">
                                     @csrf
                                 </form>

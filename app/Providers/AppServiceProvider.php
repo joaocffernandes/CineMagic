@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('genres', $options);
         Gate::define('admin', function (User $user) {
             // Only "administrator" users can "admin"
-            return $user->type;
+            return $user->type == 'A';
         });
     }
 }
