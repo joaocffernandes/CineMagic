@@ -40,3 +40,10 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::put('movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
     Route::delete('movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
 });
+
+
+Route::post('cart/{ticket}', [CartController::class, 'addToCart'])->name('cart.add');
+Route::delete('cart/{ticket}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+Route::post('cart', [CartController::class, 'confirm'])->name('cart.confirm');
+Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
