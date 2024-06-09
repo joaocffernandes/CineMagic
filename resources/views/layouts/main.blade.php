@@ -53,7 +53,7 @@
 
                         <div class="grow"></div>
 
-                        <!-- Menu Item: Cart, está antes do @auth só para testar, depois vai depois -->
+                        <!-- Menu Item: Cart, está antes do auth só para testar, depois vai depois -->
                         @if (session('cart'))
                             <x-menus.cart
                                 :href="route('cart.show')"
