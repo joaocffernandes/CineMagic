@@ -41,6 +41,15 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
 });
 
+Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
+Route::get('tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+Route::get('tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
+Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
+Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+Route::post('tickets/add-to-cart', [TicketController::class, 'addToCart'])->name('tickets.add-to-cart');
+Route::get('tockets/checkout', [TicketController::class, 'checkout'])->name('tickets.checkout');
+
 
 Route::post('cart/{ticket}', [CartController::class, 'addToCart'])->name('cart.add');
 Route::delete('cart/{ticket}', [CartController::class, 'removeFromCart'])->name('cart.remove');
