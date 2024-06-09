@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\CartController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 
