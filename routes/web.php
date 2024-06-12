@@ -7,12 +7,17 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CartController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use App\Http\Controllers\UserController;
 
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('users/showcase', [UserController::class, 'showCase'])->name('users.showcase');
+Route::delete('users/{user}/image', [UserController::class, 'destroyImage'])->name('users.image.destroy');
+Route::resource('users', UserController::class);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
