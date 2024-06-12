@@ -26,7 +26,7 @@ class UserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $this->user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,',
             'password' => 'nullable|string|min:8|confirmed',
             'password_confirmation' => 'nullable|string|min:8', // Adicione a regra para o campo de confirmação
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
