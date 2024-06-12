@@ -52,9 +52,17 @@
                         </x-menus.submenu>
 
                         <div class="grow"></div>
+
+                        <!-- Menu Item: Cart, está antes do auth só para testar, depois vai depois -->
+                        @if (session('cart'))
+                            <x-menus.cart
+                                :href="route('cart.show')"
+                                selectable="1"
+                                selected="{{ Route::currentRouteName() == 'cart.show'}}"
+                                :total="session('cart')->count()"/>                            
+                        @endif
+                                
                         @auth
-                        <!-- Menu Item: Cart -->
-                        <x-menus.cart href="#" selectable="0" selected="1" total="2" />
 
                         <x-menus.submenu selectable="0" uniqueName="submenu_user">
                             <x-slot:content>
@@ -117,6 +125,15 @@
 
         <main>
             <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                @if (session('alert-msg'))
+                    <x-alert type="{{ session('alert-type') ?? 'info' }}">
+                        {!! session('alert-msg') !!}
+                    </x-alert>
+                @endif
+                @if (!$errors->isEmpty())
+                    <x-alert type="warning" message="Operation failed because there are validation errors!"/>
+                @endif
+
                 @yield('main')
             </div>
         </main>
