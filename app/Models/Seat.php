@@ -4,23 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Movie;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Genre extends Model
+class Seat extends Model
 {
     use HasFactory, SoftDeletes;
-    public $incrementing = false;
-    protected $primaryKey = 'code';
+
+    protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [
-        'code',
-        'name',
+        'theather_id',
+        'row',
+        'seat_number',
     ];
 
-    public function Movie()
-    {
-        return $this->hasMany(Movie::class);
+    public function Theater(){
+        return $this->belongsTo(Theater::class);
     }
 }

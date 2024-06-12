@@ -5,16 +5,40 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Movie;
 use Illuminate\Http\RedirectResponse;
+use App\Models\Genre;
 
 class MovieController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $allMovies = Movie::all();
-        return view('movies.index')->with('movies', $allMovies);
+        // Start with the query builder instead of retrieving all records
+        $query = Movie::query();
+        $allGenres = Genre::all();
+        $genres = $allGenres->pluck('name', 'code')->toArray(); 
+
+        $filterByGenre = $request->query('genre');
+        $filterByName = $request->query('name');
+
+        // Apply filters based on the request query parameters
+        if ($filterByGenre !== null) {
+            $query->where('genre_code', $filterByGenre);
+        }
+        if ($filterByName !== null) {
+            $query->where('title', 'like', "%$filterByName%");
+        }
+
+        // Get the movies after applying filters
+        $movies = $query->get();
+
+        return view('movies.index', [
+            'movies' => $movies,
+            'genres' => $genres,
+            'filterByGenre' => $filterByGenre,
+            'filterByName' => $filterByName
+        ]);
     }
 
     /**
@@ -23,7 +47,11 @@ class MovieController extends Controller
     public function create()
     {
         $newMovie = new Movie();
-        return view('movies.create')->with('movie', $newMovie);
+        $allGenres = Genre::all();
+        $genres = $allGenres->pluck('name', 'code')->toArray();
+        return view('movies.create')
+            ->with('movie', $newMovie)
+            ->with('genres', $genres);
     }
 
     /**
@@ -37,8 +65,8 @@ class MovieController extends Controller
             'year' => 'required|integer|min:1900|max:2100',
             'poster_filename' => 'string|max:255',
             'synopsis' => 'required|string',
-            'trailer_url' => 'string|max:255',
-            ]);
+            'trailer_url' => 'nullable|string|max:255',
+        ]);
         Movie::create($validated);
         return redirect()->route('movies.index');
     }
@@ -48,7 +76,11 @@ class MovieController extends Controller
      */
     public function show(Movie $movie)
     {
-        return view('movies.show')->with('movie', $movie);
+        $allGenres = Genre::all();
+        $genres = $allGenres->pluck('name', 'code')->toArray(); 
+        return view('movies.show')
+            ->with('movie', $movie)
+            ->with('genres', $genres);
     }
 
     /**
@@ -56,7 +88,11 @@ class MovieController extends Controller
      */
     public function edit(Movie $movie)
     {
-        return view('movies.edit')->with('movie', $movie);
+        $allGenres = Genre::all();
+        $genres = $allGenres->pluck('name', 'code')->toArray(); 
+        return view('movies.edit')
+            ->with('movie', $movie)
+            ->with('genres', $genres);
     }
 
     /**
@@ -71,7 +107,7 @@ class MovieController extends Controller
             'poster_filename' => 'string|max:255',
             'synopsis' => 'required|string',
             'trailer_url' => 'string|max:255',
-            ]);
+        ]);
         $movie->update($validated);
         return redirect()->route('movies.index');
     }

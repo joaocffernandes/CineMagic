@@ -23,10 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // View::share adds data (variables) that are shared through all views
-        $allGenres = Genre::all();
-        $options = $allGenres->pluck('name', 'code')->toArray();       
-        View::share('genres', $options);
+        // View::share adds data (variables) that are shared through all views      
         Gate::define('admin', function (User $user) {
             // Only "administrator" users can "admin"
             return $user->type == 'A';
