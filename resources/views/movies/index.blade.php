@@ -7,6 +7,18 @@
         <div class="flex items-center gap-4 mb-4">
             <x-button href="{{ route('movies.create') }}" text="Insert a new Movie" type="success" />
         </div>
+        <div class="mt-4">
+        <x-input-label for="genrefilter" :value="__('Genres')" />
+        <x-movies.filter-card
+                id='genrefilter'
+                :filterAction="route('movies.index')"
+                :resetUrl="route('movies.index')"
+                :genres="$genres"
+                :genre="old('genre', $filterByGenre)"
+                :name="old('name', $filterByName)"
+                class="mb-6"
+                />
+        </div>
         <div class="flex flex-wrap justify-around gap-2font-base text-sm text-gray-700 dark:text-gray-300">
             @foreach ($movies as $movie)
             <div class="relative m-10 flex flex-col h-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md w-[30%] min-w-[250px] m-4 h-[650px]">
