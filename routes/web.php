@@ -10,12 +10,18 @@ use App\Http\Controllers\CartController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\StatsController;
 
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+
+Route::get('/estatisticas', [StatsController::class, 'index'])->name('estatisticas.index');
+
 
 Route::get('users/showcase', [UserController::class, 'showCase'])->name('users.showcase');
 Route::delete('users/{user}/image', [UserController::class, 'destroyImage'])->name('users.image.destroy');
