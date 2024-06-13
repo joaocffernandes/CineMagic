@@ -24,7 +24,7 @@ $modifiedGenres = Arr::prepend($genres, 'All Genres', '');
                     <x-button element="submit" type="dark" text="Filter"/>
                 </div>
                 <div>
-                    <x-button element="a" type="light" text="Cancel" :href="$resetUrl"/>
+                    <x-button element="a" type="light" text="Clear" :href="$resetUrl"/>
                 </div>
             </div>
         </div>

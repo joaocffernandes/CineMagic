@@ -19,7 +19,10 @@ Route::get('/', function () {
 
 Route::get('users/showcase', [UserController::class, 'showCase'])->name('users.showcase');
 Route::delete('users/{user}/image', [UserController::class, 'destroyImage'])->name('users.image.destroy');
+Route::get('customers', [UserController::class, 'customers'])->name('customers');
+Route::put('users/{user}/block', [UserController::class, 'block'])->name('users.block');
 Route::resource('users', UserController::class);
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -76,7 +79,7 @@ Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('ti
 Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
 Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
 Route::post('tickets/add-to-cart', [TicketController::class, 'addToCart'])->name('tickets.add-to-cart');
-Route::get('tockets/checkout', [TicketController::class, 'checkout'])->name('tickets.checkout');
+Route::get('tickets/checkout', [TicketController::class, 'checkout'])->name('tickets.checkout');
 
 
 Route::post('cart/{ticket}', [CartController::class, 'addToCart'])->name('cart.add');
@@ -84,3 +87,5 @@ Route::delete('cart/{ticket}', [CartController::class, 'removeFromCart'])->name(
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
 Route::post('cart', [CartController::class, 'confirm'])->name('cart.confirm');
 Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
+
+Route::get('screenings', [MovieController::class, 'screenings'])->name('screenings.index');
