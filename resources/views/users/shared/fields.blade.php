@@ -35,6 +35,6 @@
 <x-field.radio-group name="type" label="Type of user" :readonly="$readonly"
                 value="{{ old('type', $user->type) }}"
                 :options="[
-                     'Admin' => 'A',
-                     'Employee' => 'E',
+                     'A' => 'Administrator',
+                     'E' => 'Employee',
                 ]"/>

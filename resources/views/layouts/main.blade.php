@@ -34,7 +34,7 @@
                     <div id="menu-container" class="grow flex flex-col sm:flex-row items-stretch
                     invisible h-0 sm:visible sm:h-auto">
                         <!-- Menu Item: Courses -->
-                        <x-menus.menu-item content="Movies" href="{{ route('movies.index') }}" selected="{{ Route::currentRouteName() == 'movies.index'}}" />
+                        <x-menus.menu-item content="On Screen" href="{{ route('screenings.index') }}" selected="{{ Route::currentRouteName() == 'screenings.index'}}" />
 
                         <!-- Menu Item: Disciplines -->
                         <x-menus.menu-item content="Genres" href="{{ route('genres.index') }}" selected="{{ Route::currentRouteName() == 'genres.index'}}" />
@@ -47,8 +47,8 @@
                             <x-menus.submenu-item content="Movies" href="{{ route('movies.index') }}" selected="{{ Route::currentRouteName() == 'movies.index'}}" />
                             <x-menus.submenu-item content="Genres" href="{{ route('genres.index') }}" selected="{{ Route::currentRouteName() == 'genres.index'}}" />
                             <hr>
-                            <x-menus.submenu-item content="Departments" selectable="0" href="#" />
-                            <x-menus.submenu-item content="Course Management" selectable="0" href="#" />
+                            <x-menus.submenu-item content="Customers" href="{{ route('customers') }}" selected="{{ Route::currentRouteName() == 'customers'}}" />
+                            <x-menus.submenu-item content="Staff" href="{{ route('users.index') }}" selected="{{ Route::currentRouteName() == 'users.index'}}" />
                         </x-menus.submenu>
 
                         <div class="grow"></div>
