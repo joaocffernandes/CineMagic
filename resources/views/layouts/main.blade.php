@@ -36,32 +36,28 @@
                         <!-- Menu Item: Courses -->
                         <x-menus.menu-item content="On Screen" href="{{ route('screenings.index') }}" selected="{{ Route::currentRouteName() == 'screenings.index'}}" />
 
-                        <!-- Menu Item: Disciplines -->
-                        <x-menus.menu-item content="Genres" href="{{ route('genres.index') }}" selected="{{ Route::currentRouteName() == 'genres.index'}}" />
-
-                        <!-- Menu Item: Teachers -->
-                        <x-menus.menu-item content="Teachers" href="#" selected="0" />
-
+                        @auth
+                        @if(Auth::user()->type == 'A' || Auth::user()->type == 'E')
                         <!-- Menu Item: Others -->
                         <x-menus.submenu selectable="0" uniqueName="submenu_others" content="More">
                             <x-menus.submenu-item content="Movies" href="{{ route('movies.index') }}" selected="{{ Route::currentRouteName() == 'movies.index'}}" />
                             <x-menus.submenu-item content="Genres" href="{{ route('genres.index') }}" selected="{{ Route::currentRouteName() == 'genres.index'}}" />
                             <hr>
+                            @if(Auth::user()->type == 'A')
                             <x-menus.submenu-item content="Customers" href="{{ route('customers') }}" selected="{{ Route::currentRouteName() == 'customers'}}" />
                             <x-menus.submenu-item content="Staff" href="{{ route('users.index') }}" selected="{{ Route::currentRouteName() == 'users.index'}}" />
+                            @endif
                         </x-menus.submenu>
+                        @endif
+                        @endauth
 
                         <div class="grow"></div>
 
                         <!-- Menu Item: Cart, está antes do auth só para testar, depois vai depois -->
                         @if (session('cart'))
-                            <x-menus.cart
-                                :href="route('cart.show')"
-                                selectable="1"
-                                selected="{{ Route::currentRouteName() == 'cart.show'}}"
-                                :total="session('cart')->count()"/>                            
+                        <x-menus.cart :href="route('cart.show')" selectable="1" selected="{{ Route::currentRouteName() == 'cart.show'}}" :total="session('cart')->count()" />
                         @endif
-                                
+
                         @auth
 
                         <x-menus.submenu selectable="0" uniqueName="submenu_user">
@@ -126,12 +122,12 @@
         <main>
             <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 @if (session('alert-msg'))
-                    <x-alert type="{{ session('alert-type') ?? 'info' }}">
-                        {!! session('alert-msg') !!}
-                    </x-alert>
+                <x-alert type="{{ session('alert-type') ?? 'info' }}">
+                    {!! session('alert-msg') !!}
+                </x-alert>
                 @endif
                 @if (!$errors->isEmpty())
-                    <x-alert type="warning" message="Operation failed because there are validation errors!"/>
+                <x-alert type="warning" message="Operation failed because there are validation errors!" />
                 @endif
 
                 @yield('main')

@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
@@ -40,16 +41,28 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'nullable|string|min:8|confirmed',
             'password_confirmation' => 'nullable|string|min:8', // Adicione a regra para o campo de confirmação
-            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'photo_filename' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
             'type' => 'required|string|in:A,E',
         ]);
 
-        $newUser = User::create($validated);
-
-        if ($request->hasFile('image_file')) {
-            $request->image_file->storeAs('public/users', $newUser->photo_filename);
+        
+        if ($request->hasFile('photo_filename')) {
+            $path = $request->photo_filename->store('public/photos');
+            $validated['photo_filename'] = basename($path);
+        }else{
+            $path = NULL;
+            $validated['photo_filename'] = $path;
         }
 
+        $newUser = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'type' => $validated['type'],
+            'photo_filename' => $validated['photo_filename']
+        ]);
+
+        
         $url = route('users.show', ['user' => $newUser]);
         $htmlMessage = "User <a href='$url'><u>{$newUser->name}</u></a> ({$newUser->email}) has been created successfully!";
         return redirect()->route('users.index')
@@ -66,6 +79,17 @@ class UserController extends Controller
     {
         // Validar os dados recebidos
         $validatedData = $request->validated();
+
+        if ($request->hasFile('photo_filename')) {
+            if (
+                $user->photo_filename &&
+                Storage::fileExists('public/photos/' . $user->photo_filename)
+            ) {
+                Storage::delete('public/photos/' . $user->photo_filename);
+            }
+            $path = $request->photo_filename->store('public/photos');
+            $validatedData['photo_filename'] = basename($path);
+        }
 
         // Atualizar a senha se for fornecida
         if (!empty($validatedData['password'])) {
@@ -108,6 +132,30 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with('user', $user);;
+    }
+
+    public function destroyPhoto(User $user){
+
+        if (!$user->photo_filename) {
+            return redirect()->back()
+                ->with('alert-type', 'warning')
+                ->with('alert-msg', "No photo available to delete.");
+        }
+
+        $photoPath = 'public/photos/' . $user->photo_filename;
+        if (!Storage::exists($photoPath)) {
+            return redirect()->back()
+                ->with('alert-type', 'danger')
+                ->with('alert-msg', "File does not exist on the server.");
+        }
+
+        Storage::delete($photoPath);
+        $user->photo_filename = null;
+        $user->save();
+
+        return redirect()->back()
+            ->with('alert-type', 'success')
+            ->with('alert-msg', "Photo of user {$user->name} has been deleted.");
     }
 
     public function block($id)

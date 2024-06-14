@@ -18,17 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-
 Route::get('/estatisticas', [StatsController::class, 'index'])->name('estatisticas.index');
-
-
-Route::get('users/showcase', [UserController::class, 'showCase'])->name('users.showcase');
-Route::delete('users/{user}/image', [UserController::class, 'destroyImage'])->name('users.image.destroy');
-Route::get('customers', [UserController::class, 'customers'])->name('customers');
-Route::put('users/{user}/block', [UserController::class, 'block'])->name('users.block');
-Route::resource('users', UserController::class);
-
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -49,7 +39,7 @@ Route::middleware('auth', 'verified')->group(function () {
         ->middleware('can:crudMy,App\Models\User');;
 });
 
-Route::middleware('auth', 'verified')->group(function () {
+Route::middleware('auth', 'verified', 'can:admin')->group(function () {
     Route::get('movies', [MovieController::class, 'index'])->name('movies.index');
     Route::get('movies/create', [MovieController::class, 'create'])->name('movies.create');
     Route::post('movies', [MovieController::class, 'store'])->name('movies.store');
@@ -57,18 +47,15 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
     Route::put('movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
     Route::delete('movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
-});
+    Route::delete('movies/{movie}/poster', [MovieController::class, 'destroyPoster'])->name('movies.destroy.poster');
 
-Route::middleware('auth', 'verified')->group(function () {
     Route::get('genres', [GenreController::class, 'index'])->name('genres.index');
     Route::get('genres/create', [GenreController::class, 'create'])->name('genres.create');
     Route::post('genres', [GenreController::class, 'store'])->name('genres.store');
     Route::get('genres/{genre}/edit', [GenreController::class, 'edit'])->name('genres.edit');
     Route::put('genres/{genre}', [GenreController::class, 'update'])->name('genres.update');
     Route::delete('genre/{genre}', [GenreController::class, 'destroy'])->name('genres.destroy');
-});
 
-Route::middleware('auth', 'verified')->group(function () {
     Route::get('theaters', [TheaterController::class, 'index'])->name('theaters.index');
     Route::get('theaters/create', [TheaterController::class, 'create'])->name('theaters.create');
     Route::post('theaters', [TheaterController::class, 'store'])->name('theaters.store');
@@ -76,6 +63,21 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('theaters/{theater}/edit', [TheaterController::class, 'edit'])->name('theaters.edit');
     Route::put('theaters/{theater}', [TheaterController::class, 'update'])->name('theaters.update');
     Route::delete('theaters/{theater}', [TheaterController::class, 'destroy'])->name('theaters.destroy');
+
+    Route::get('screenings/{screening}', [MovieController::class, 'editScreening'])->name('screenings.edit');
+    Route::put('screenings/{screening}/update', [MovieController::class, 'updateScreening'])->name('screenings.update');
+    Route::delete('screenings/{screening}', [MovieController::class, 'destroyScreening'])->name('screenings.destroy');
+    Route::get('screenings/create/{movie}', [MovieController::class, 'createScreening'])->name('screenings.create');
+    Route::post('screenings/create/{movie}', [MovieController::class, 'storeScreening'])->name('screenings.store');
+
+    Route::get('configuration', [MovieController::class, 'editPrice'])->name('configuration.edit');
+    Route::put('configuration', [MovieController::class, 'updatePrice'])->name('configuration.update');
+
+    Route::delete('users/{user}/image', [UserController::class, 'destroyImage'])->name('users.image.destroy');
+    Route::get('customers', [UserController::class, 'customers'])->name('customers');
+    Route::put('users/{user}/block', [UserController::class, 'block'])->name('users.block');
+    Route::delete('users/{user}/photo', [UserController::class, 'destroyPhoto'])->name('users.destroy.photo');
+    Route::resource('users', UserController::class);
 });
 
 Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');

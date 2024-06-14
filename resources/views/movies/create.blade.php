@@ -13,7 +13,7 @@
                         Click on "Save" button to store the information.
                     </p>
                 </header>
-                <form method="POST" action="{{ route('movies.store') }}">
+                <form method="POST" action="{{ route('movies.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mt-6 space-y-4">
                         @include('movies.shared.fields', ['mode' => 'create'])
@@ -26,4 +26,8 @@
         </div>
     </div>
 </div>
+<form class="hidden" id="form_to_delete_photo" method="POST" action="{{ route('movies.destroy.poster', ['movie', $movie]) }}">
+    @csrf
+    @method('DELETE')
+</form>
 @endsection

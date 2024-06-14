@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Genre;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Movie extends Model
 {
@@ -27,5 +28,14 @@ class Movie extends Model
 
     public function screenings(){
         return $this->hasMany(Screening::class, 'movie_id');
+    }
+
+    public function getPosterFullUrlAttribute()
+    {
+        if ($this->poster_filename && Storage::exists("public/posters/{$this->poster_filename}")) {
+            return asset("storage/posters/{$this->poster_filename}");
+        } else {
+            return asset("storage/posters/_no_poster_1.png");
+        }
     }
 }

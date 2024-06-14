@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\Movie;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
