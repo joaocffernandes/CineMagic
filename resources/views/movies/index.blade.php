@@ -8,16 +8,8 @@
             <x-button href="{{ route('movies.create') }}" text="Insert a new Movie" type="success" />
         </div>
         <div class="mt-4">
-        <x-input-label for="genrefilter" :value="__('Genres')" />
-        <x-movies.filter-card
-                id='genrefilter'
-                :filterAction="route('movies.index')"
-                :resetUrl="route('movies.index')"
-                :genres="$genres"
-                :genre="old('genre', $filterByGenre)"
-                :name="old('name', $filterByName)"
-                class="mb-6"
-                />
+            <x-input-label for="genrefilter" :value="__('Genres')" />
+            <x-movies.filter-card id='genrefilter' :filterAction="route('movies.index')" :resetUrl="route('movies.index')" :genres="$genres" :genre="old('genre', $filterByGenre)" :name="old('name', $filterByName)" class="mb-6" />
         </div>
         <div class="flex flex-wrap justify-around gap-2font-base text-sm text-gray-700 dark:text-gray-300">
             @foreach ($movies as $movie)
@@ -43,6 +35,9 @@
                     <x-table.icon-show class="ps-3 px-0.5" href="{{ route('movies.show', ['movie' => $movie]) }}" />
                     <x-table.icon-edit class="px-0.5" href="{{ route('movies.edit', ['movie' => $movie]) }}" />
                     <x-table.icon-delete class="px-0.5" action="{{ route('movies.destroy', ['movie' => $movie]) }}" />
+                </div>
+                <div class="flex justify-center mb-5">
+                <x-button href="{{ route('screenings.create', ['movie' => $movie]) }}" text="Add Movie on Screen" type="dark" />
                 </div>
                 <!--</div>-->
             </div>

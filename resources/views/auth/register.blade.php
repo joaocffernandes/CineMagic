@@ -63,7 +63,8 @@
 
                 <div>
                     <div class="pb-6 mb-10 ml-20">
-                        <x-field.image id="avatar" name="photo_filename" label="Photo" width="md" :readonly="false" deleteTitle="Delete Photo" :deleteAllow="false" :imageUrl="$user->PhotoFullUrl" />                    </div>
+                        <x-field.image id="avatar" name="photo_filename" label="Photo" width="md" :readonly="false" deleteTitle="Delete Photo" :deleteAllow="false" :imageUrl="$user->PhotoFullUrl" />                    
+                    </div>
                 </div>
             </div>
 

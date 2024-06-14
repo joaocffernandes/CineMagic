@@ -13,7 +13,7 @@
                         Click on "Save" button to store the information.
                     </p>
                 </header>
-                <form method="POST" action="{{ route('users.update', ['user'=>$user]) }}">
+                <form method="POST" action="{{ route('users.update', ['user'=>$user]) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="mt-6 space-y-4">
@@ -27,4 +27,9 @@
         </div>
     </div>
 </div>
+
+<form class="hidden" id="form_to_delete_photo" method="POST" action="{{ route('users.destroy.photo', ['user' => $user]) }}">
+    @csrf
+    @method('DELETE')
+</form>
 @endsection
