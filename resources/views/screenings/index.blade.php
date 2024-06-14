@@ -64,7 +64,7 @@
                         <x-button href="javascript:void(0)" element="submit" type="dark" text="Buy tickets" class="uppercase" />
                     </div>
                     @endif
-                    @if (Auth::check() && Auth::user()->type != 'C')
+                    @if (Auth::check() && Auth::user()->type == 'A')
                     <div class="flex grow justify-end mt-1">
                         <x-table.icon-show class="ps-3 px-0.5" href="{{ route('movies.show', ['movie' => $movie]) }}" />
                         <x-table.icon-edit href="javascript:void(0)" class="px-0.5" onclick="editScreening({{ $movie->id }})" />
