@@ -37,16 +37,14 @@
                         <x-menus.menu-item content="On Screen" href="{{ route('screenings.index') }}" selected="{{ Route::currentRouteName() == 'screenings.index'}}" />
 
                         @auth
-                        @if(Auth::user()->type == 'A' || Auth::user()->type == 'E')
+                        @if(Auth::user()->type == 'A')
                         <!-- Menu Item: Others -->
                         <x-menus.submenu selectable="0" uniqueName="submenu_others" content="More">
                             <x-menus.submenu-item content="Movies" href="{{ route('movies.index') }}" selected="{{ Route::currentRouteName() == 'movies.index'}}" />
                             <x-menus.submenu-item content="Genres" href="{{ route('genres.index') }}" selected="{{ Route::currentRouteName() == 'genres.index'}}" />
                             <hr>
-                            @if(Auth::user()->type == 'A')
                             <x-menus.submenu-item content="Customers" href="{{ route('customers') }}" selected="{{ Route::currentRouteName() == 'customers'}}" />
                             <x-menus.submenu-item content="Staff" href="{{ route('users.index') }}" selected="{{ Route::currentRouteName() == 'users.index'}}" />
-                            @endif
                         </x-menus.submenu>
                         @endif
                         @endauth
