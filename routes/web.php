@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/estatisticas', [StatsController::class, 'index'])->name('estatisticas.index');
+Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

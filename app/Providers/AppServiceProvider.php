@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
-use App\Models\Genre;
 use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,9 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // View::share adds data (variables) that are shared through all views      
+        // Definir uma autorização de 'admin'
         Gate::define('admin', function (User $user) {
-            // Only "administrator" users can "admin"
+            // Apenas usuários do tipo "A" podem acessar recursos de administrador
             return $user->type == 'A';
         });
     }

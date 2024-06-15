@@ -45,6 +45,7 @@
                             <hr>
                             <x-menus.submenu-item content="Customers" href="{{ route('customers') }}" selected="{{ Route::currentRouteName() == 'customers'}}" />
                             <x-menus.submenu-item content="Staff" href="{{ route('users.index') }}" selected="{{ Route::currentRouteName() == 'users.index'}}" />
+                            <x-menus.submenu-item content="Stats" href="{{ route('stats.index') }}" selected="{{ Route::currentRouteName() == 'stats.index'}}" />
                         </x-menus.submenu>
                         @endif
                         @endauth
