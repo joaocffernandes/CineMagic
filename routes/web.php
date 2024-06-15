@@ -20,7 +20,7 @@ Route::get('/', function () {
 
 
 
-Route::get('/estatisticas', [StatsController::class, 'index'])->name('estatisticas.index');
+Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
 
 
 Route::get('users/showcase', [UserController::class, 'showCase'])->name('users.showcase');

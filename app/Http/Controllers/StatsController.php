@@ -9,18 +9,17 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Movie;
 use Illuminate\Support\Facades\Auth;
 
+
 class StatsController extends Controller
 {
     public function index()
     {
         if (Auth::check() && Auth::user()->type === 'A') {
-            // Bilhetes
             $minimo = Ticket::min('price');
             $maximo = Ticket::max('price');
             $media = Ticket::avg('price');
             $mediaFinal = number_format($media, 2, '.', ' ');
 
-            // Filmes menos vistos
             $filmesMenosVistos = DB::select("SELECT screenings.movie_id
                 FROM tickets
                 JOIN screenings ON screenings.id = tickets.screening_id
@@ -36,7 +35,6 @@ class StatsController extends Controller
                     ) AS count_tickets_movie
                 )");
 
-            // Filmes mais vistos
             $filmesMaisVistos = DB::select("SELECT screenings.movie_id
                 FROM tickets
                 JOIN screenings ON screenings.id = tickets.screening_id
@@ -52,17 +50,14 @@ class StatsController extends Controller
                     ) AS count_tickets_movie
                 )");
 
-            // Extrair IDs dos filmes
             $idsMenosVistos = array_map(function($filme) { return $filme->movie_id; }, $filmesMenosVistos);
             $idsMaisVistos = array_map(function($filme) { return $filme->movie_id; }, $filmesMaisVistos);
 
-            // Buscar os filmes
             $filmes = Movie::whereIn('id', $idsMenosVistos)
                 ->orWhereIn('id', $idsMaisVistos)
                 ->get()
                 ->keyBy('id');
 
-            // Gêneros
             $data = DB::table('movies')
                 ->select(
                     DB::raw('genres.name AS genre'),
@@ -77,7 +72,7 @@ class StatsController extends Controller
                 $array[] = [$value->genre, $value->count];
             }
 
-            return view('estatisticas.index', [
+            return view('stats.index', [
                 'minimo' => $minimo,
                 'maximo' => $maximo,
                 'media' => $mediaFinal,

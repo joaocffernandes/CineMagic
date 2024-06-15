@@ -4,7 +4,17 @@
 @section('main')
 <div class="container">
 
+<div class="card mt-4">
+        <x-button text="Exportar PDF" onclick="printPage()" type="success"/>
+        <script>
+        function printPage() {
+        window.print();
+        }
+        </script>
+    </div>
+
     <div class="card">
+        <br>
         <div class="card-header">Bilhetes</div>
         <br>
         <div class="card-body">
@@ -19,16 +29,15 @@
         <br>
         <div class="card-body">
             <h3><b>Filmes Mais Vistos:</b></h3>
-                <ul>
-                    @foreach($idsMaisVistos as $id)
-                        @if(isset($filmes[$id]))
-                            <li>{{ $filmes[$id]->title }}</li>
-                        @else
-                            <li>Filme não encontrado para ID {{ $id }}</li>
-                        @endif
-                    @endforeach
-                </ul>
-
+            <ul>
+                @foreach($idsMaisVistos as $id)
+                    @if(isset($filmes[$id]))
+                        <li>{{ $filmes[$id]->title }}</li>
+                    @else
+                        <li>Filme não encontrado para ID {{ $id }}</li>
+                    @endif
+                @endforeach
+            </ul>
 
             <h3><b>Filmes Menos Vistos:</b></h3>
             <ul>
