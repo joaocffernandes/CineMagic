@@ -4,7 +4,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Ticket;
+use App\Models\Purchase;
+use App\Services\PurchaseService;
+use App\Models\Screening;
+use App\Models\Seat;
+use App\Models\Configuration;
+use App\Services\Payment;
+use Carbon\Carbon;
+
 
 class CartController extends Controller
 {
@@ -14,62 +25,210 @@ class CartController extends Controller
         return view('cart.show', compact('cart'));
     }
 
-    public function addToCart(Request $request, Ticket $ticket): RedirectResponse
+    public function createTicketAndAddToCart(Screening $screening): RedirectResponse 
+    {
+        // For test
+        $seat = $screening->theater->seat()->inRandomOrder()->first();
+
+        // Discount for registed users
+        $config = Configuration::getSettings();
+        if (auth()->check()) {
+            $price = $config->ticket_price - $config->customer_ticket_discount;
+        } else {
+            $price = $config->ticket_price;
+        }
+
+        // using make to not save in BD, only creating ref
+        $ticket = Ticket::make([
+            'purchase_id' => null,
+            'screening_id' => $screening->id,
+            'seat_id' => $seat->id,
+            'price' => $price,
+            'status' => 'valid',
+            'qrcode_url' => null
+        ]);
+
+        
+        return $this->addToCart($ticket);
+    }
+
+    private function addToCart(Ticket $ticket): RedirectResponse
     {
         $cart = session('cart', null);
+
+        $currentTime = now();
+        // Verifica se o tempo atual é mais do que 5 minutos após o início da sessão
+        $screeningDatetime = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->screening->date . ' ' . $ticket->screening->start_time);
+        if ($screeningDatetime->addMinutes(5)->lt($currentTime)) {
+            return back()->with('alert-msg', 'This screening session has already started more than 5 minutes ago.')
+                         ->with('alert-type', 'danger');
+        }
+
+        $exists = $cart?->contains(function ($value) use ($ticket) {
+            return $value['screening_id'] == $ticket->screening_id && $value['seat_id'] == $ticket->seat_id;
+        });
+    
         if (!$cart) {
             $cart = collect([$ticket]);
-            $request->session()->put('cart', $cart);
+            session()->put('cart', $cart);
         } else { 
-            if ($cart->firstWhere('id', $ticket->id)) {
-            $alertType = 'warning';
-            $url = route('tickets.show', ['ticket' => $ticket]);
-            $htmlMessage = "Ticket <a href='$url'>#{$ticket->id}</a> <strong>\"{$ticket->screening->movie->title}\"</strong> was not added to the cart because it is already there!";
-            return back()
-                ->with('alert-msg', $htmlMessage)
-                ->with('alert-type', $alertType);
+            if ($exists) {
+                $alertType = 'warning';
+                $htmlMessage = "Ticket <strong>\"{$ticket->screening->movie->title}\"</strong> was not added to the cart because it is already there!";
+                return back()
+                    ->with('alert-msg', $htmlMessage)
+                    ->with('alert-type', $alertType);
             } else {
                 $cart->push($ticket);
             }
         }
 
         $alertType = 'success';
-        $url = route('tickets.show', ['ticket' => $ticket]);
-        $htmlMessage = "Ticket <a href='$url'>#{$ticket->id}</a> <strong>\"{$ticket->screening->movie->title}\"</strong> was added to the cart.";
+        $htmlMessage = "Ticket <strong>\"{$ticket->screening->movie->title}\"</strong> was added to the cart.";
         return back()
             ->with('alert-msg', $htmlMessage)
             ->with('alert-type', $alertType);
     }
 
-    public function removeFromCart(Request $request, Ticket $ticket): RedirectResponse
+    public function removeFromCart($screeningId, $seatId)
     {
-        $url = route('tickets.show', ['ticket' => $ticket]);
-        $cart = session('cart', null);
-        if (!$cart) {
-            $alertType = 'warning';
-            $htmlMessage = "Ticket <a href='$url'>#{$ticket->id}</a> was not removed from the cart because cart is empty!";
-            return back()
-                ->with('alert-msg', $htmlMessage)
-                ->with('alert-type', $alertType);
-        } else {
-            $element = $cart->firstWhere('id', $ticket->id);
-            if ($element) {
-                $cart->forget($cart->search($element));
-                if ($cart->count() == 0) {
-                    $request->session()->forget('cart');
-                }
-                $alertType = 'success';
-                $htmlMessage = "Ticket <a href='$url'>#{$ticket->id}</a> was removed from the cart.";
-                return back()
-                    ->with('alert-msg', $htmlMessage)
-                    ->with('alert-type', $alertType);
+        $tickets = session('cart', collect());
+    
+        $ticketIndex = $tickets->search(function ($ticket) use ($screeningId, $seatId) {
+            return $ticket->screening_id == $screeningId && $ticket->seat_id == $seatId;
+        });
+    
+        if ($ticketIndex !== false) {
+            $ticket = $tickets->pull($ticketIndex);
+    
+            if($tickets->count() > 0) {
+                session(['cart' => $tickets]);
             } else {
-                $alertType = 'warning';
-                $htmlMessage = "Ticket <a href='$url'>#{$ticket->id}</a> was not removed from the cart because cart does not include it!";
-                return back()
-                    ->with('alert-msg', $htmlMessage)
-                    ->with('alert-type', $alertType);
+                session()->forget('cart');
             }
+    
+            $alertMessage = "Ticket for <strong>\"{$ticket->screening->movie->title}\"</strong> was removed from the cart.";
+    
+            return back()->with('alert-msg', $alertMessage)->with('alert-type', 'success');
+        } else {
+            return back()->with('alert-msg', "Ticket not found in the cart.")->with('alert-type', 'warning');
+        }
+    }
+
+    public function checkout()
+    {
+        $cart = session('cart', collect());
+        if ($cart->isEmpty()) {
+            return redirect()->route('cart.show')->with([
+                'alert-type' => 'warning',
+                'alert-msg' => 'Your shopping cart is empty. Please add some tickets before proceeding to checkout.'
+            ]);
+        }
+    
+        $user = auth()->user();
+        $customer = $user->customer;
+    
+        return view('checkout.show', [
+            'cart' => $cart, 
+            'customer' => $customer, 
+            'user' => $user
+        ]);
+    }
+
+    public function confirm(Request $request)
+    {
+        $cart = session('cart', collect());
+        if ($cart->isEmpty()) {
+            return back()->with('alert-msg', 'Your cart is empty.')->with('alert-type', 'warning');
+        }
+
+        $this->validateParams($request);
+        $paymentResult = $this->processPayment($request->all());
+
+
+        if ($paymentResult !== false) {
+            $purchase = DB::transaction(function () use ($cart, $request) {
+                $purchase = Purchase::create([
+                    'customer_id' => auth()->user()->customer->id ?? null,
+                    'total_price' => $cart->sum('price'),
+                    'customer_name' => $request->name,
+                    'customer_email' => $request->email,
+                    'nif' => $request->nif,
+                    'payment_type' => $request->payment_type,
+                    'payment_ref' => $request->payment_ref,
+                    'date' => now()->toDateString(),
+                    'receipt_pdf_filename' => null
+                ]);
+
+                foreach ($cart as $ticket) {
+
+                    // Hard url for qrcode_url
+                    $randomString = Str::random(40);
+                    $hash = hash('sha256', $ticket->screening_id . $ticket->seat_id . $randomString); 
+                    $ticket->qrcode_url = url("/tickets/validate/{$ticket->screening_id}/{$ticket->seat_id}/{$hash}"); 
+                
+                    $ticket->purchase_id = $purchase->id;
+                    $ticket->status = 'valid';
+                    $ticket->save();
+                }
+
+                $purchase->receipt_pdf_filename = PurchaseService::createPdfOfPurchase($purchase, $cart);
+                $purchase->save();
+
+                PurchaseService::sendPurchaseReceiptWithTickets($purchase);
+                session()->forget('cart');
+                return $purchase;
+            });
+
+            return redirect()->route('purchases.show', ['purchase' => $purchase->id])
+                ->with('alert-msg', 'Purchase completed successfully.')->with('alert-type', 'success');
+        } else {
+            return back()->with('alert-msg', 'Payment failed. Please try again.')->with('alert-type', 'danger');
+        }
+    }
+
+    private function validateParams($request) {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|email',
+            'nif' => 'required|digits:9',
+            'payment_type' => 'required|string|in:VISA,PAYPAL,MBWAY',
+        ];
+
+
+        if ($request->payment_type == 'MBWAY'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|regex:/^9\d{8}$/',
+            ]);
+        }
+
+        if ($request->payment_type == 'PAYPAL'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|string|email|max:255',
+            ]);
+        }
+
+        if ($request->payment_type == 'VISA'){
+            $rules = array_merge($rules, [
+                'payment_ref' => 'required|regex:/^4[0-9]{15}$/',
+                'cvc' => 'required|regex:/^[0-9]{2}[013-9]$/'
+            ]);
+        }
+
+        $request->validate($rules);
+    } 
+
+    private function processPayment($data)
+    {
+        switch ($data['payment_type']) {
+            case 'VISA':
+                return Payment::payWithVisa($data['payment_ref'], $data['cvc']);
+            case 'PAYPAL':
+                return Payment::payWithPaypal($data['payment_ref']);
+            case 'MBWAY':
+                return Payment::payWithMBway($data['payment_ref']);
+            default:
+                return false;
         }
     }
 
