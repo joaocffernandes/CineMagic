@@ -8,6 +8,7 @@ use App\Http\Controllers\TheaterController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SeatController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use App\Http\Controllers\UserController;
@@ -95,7 +96,9 @@ Route::middleware('auth', 'verified', 'can:admin')->group(function () {
     Route::resource('users', UserController::class);
 });
 
-Route::get('cart/createTicketAndAddToCart/{screening}', [CartController::class, 'createTicketAndAddToCart'])->name('cart.createTicketAndAddToCart');
+Route::get('seats/reserve/{screening}/{quantTickets}', [SeatController::class, 'show'])->name('seats.reserve');
+
+Route::post('cart/createTicketAndAddToCart', [CartController::class, 'createTicketAndAddToCart'])->name('cart.createTicketAndAddToCart');
 Route::delete('cart/{screeningId}/{seatId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
 Route::post('cart', [CartController::class, 'confirm'])->name('cart.confirm');
