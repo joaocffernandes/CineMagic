@@ -180,8 +180,15 @@ class CartController extends Controller
                 return $purchase;
             });
 
-            return redirect()->route('purchases.show', ['purchase' => $purchase->id])
-                ->with('alert-msg', 'Purchase completed successfully.')->with('alert-type', 'success');
+            if (auth()->check()) 
+            {
+                return redirect()->route('purchases.show', ['purchase' => $purchase->id])
+                    ->with('alert-msg', 'Purchase completed successfully.')->with('alert-type', 'success');
+            } 
+            else 
+            {
+                return redirect()->route('screenings.index')->with('alert-type', 'success')->with('alert-msg', 'Purchase completed successfully. The receipts was sent to your email.');
+            }
         } else {
             return back()->with('alert-msg', 'Payment failed. Please try again.')->with('alert-type', 'danger');
         }
