@@ -17,7 +17,7 @@ class FilterCard extends Component
         public string $filterAction,
         public string $resetUrl,
         public ?string $movie = null,
-        public ?string $date = null
+        public ?string $date = null,
     )
     {
         // Assumes movies are passed as ['id' => 'title'] pairs
