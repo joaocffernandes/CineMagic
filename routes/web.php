@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -94,6 +94,8 @@ Route::middleware('auth', 'verified', 'can:admin')->group(function () {
     Route::put('users/{user}/block', [UserController::class, 'block'])->name('users.block');
     Route::delete('users/{user}/photo', [UserController::class, 'destroyPhoto'])->name('users.destroy.photo');
     Route::resource('users', UserController::class);
+
+    Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
 });
 
 Route::get('seats/reserve/{screening}/{quantTickets}', [SeatController::class, 'show'])->name('seats.reserve');
