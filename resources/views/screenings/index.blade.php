@@ -79,6 +79,17 @@
     </div>
 </div>
 
+<div id="ticketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
+    <div class="bg-white p-8 rounded-lg">
+        <h3 class="font-semibold text-lg">Select the quantity of tickets:</h3>
+        <input type="number" id="quantityInput" class="border p-2 mt-2 w-full" min="1" value="1">
+        <div class="text-right space-x-4 mt-4">
+            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal()">Cancel</button>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="proceedToReserve()">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <form id="deleteForm" action="" method="POST" style="display:none;">
     @csrf
     @method('DELETE')
@@ -109,14 +120,33 @@
         }
     }
 
-    function buyTicket(movieId){
+    function buyTicket(movieId) {
         const selectElement = document.getElementById(`screeningSelect-${movieId}`);
         const screeningId = selectElement.value;
         if (screeningId) {
-            window.location.href = `cart/createTicketAndAddToCart/${screeningId}`;
+            showModal(movieId); 
         } else {
             alert('Please select a screening.');
         }
+    }
+
+    function showModal(movieId) {
+        const modal = document.getElementById('ticketModal');
+        modal.style.display = 'flex';
+        modal.setAttribute('data-movie-id', movieId);  // Configura o movieId como um atributo no modal
+    }
+
+    function closeModal() {
+        document.getElementById('ticketModal').style.display = 'none';
+    }
+
+    function proceedToReserve() {
+        const modal = document.getElementById('ticketModal');
+        const movieId = modal.getAttribute('data-movie-id');  // Recupera o movieId do modal
+        const screeningId = document.getElementById(`screeningSelect-${movieId}`).value;
+        const quantity = document.getElementById('quantityInput').value;
+        closeModal();
+        window.location.href = `seats/reserve/${screeningId}/${quantity}`;
     }
 </script>
 @endsection
