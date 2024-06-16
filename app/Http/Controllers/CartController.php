@@ -126,7 +126,7 @@ class CartController extends Controller
         }
     
         $user = auth()->user();
-        $customer = $user->customer;
+        $customer = $user?->customer;
     
         return view('checkout.show', [
             'cart' => $cart, 
