@@ -20,8 +20,13 @@ class Customer extends Model
         'payment_ref',
     ];
 
+    //public function user()
+    //{
+    //    return $this->belongsTo(User::class);
+    //}
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class, 'id', 'id');
     }
 }
