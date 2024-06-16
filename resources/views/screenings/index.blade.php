@@ -61,7 +61,7 @@
                 <div class="flex mb-5 gap-3 w-full">
                     @if (Auth::check() && Auth::user()->type == 'C' || Auth::guest())
                     <div class="justify-start ml-3">
-                        <x-button href="javascript:void(0)" element="submit" type="dark" text="Buy tickets" class="uppercase" />
+                        <x-button href="javascript:void(0)" onclick="buyTicket({{ $movie->id }})" element="submit" type="dark" text="Buy tickets" class="uppercase" />
                     </div>
                     @endif
                     @if (Auth::check() && Auth::user()->type == 'A')
@@ -113,7 +113,7 @@
         const selectElement = document.getElementById(`screeningSelect-${movieId}`);
         const screeningId = selectElement.value;
         if (screeningId) {
-            window.location.href = `/screenings/${screeningId}`;
+            window.location.href = `cart/createTicketAndAddToCart/${screeningId}`;
         } else {
             alert('Please select a screening.');
         }
