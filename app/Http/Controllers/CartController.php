@@ -25,67 +25,86 @@ class CartController extends Controller
         return view('cart.show', compact('cart'));
     }
 
-    public function createTicketAndAddToCart(Screening $screening): RedirectResponse 
+    public function createTicketAndAddToCart(Request $request): RedirectResponse 
     {
-        // For test
-        $seat = $screening->theater->seat()->inRandomOrder()->first();
+        $screeningId = $request->input('screening');
+        $seatIds = $request->input('seats');
+    
+        if ($seatIds == null || empty($seatIds)) {
+            return back()->with('alert-msg', "You must select an seat")->with('alert-type', 'danger');
+        }
 
-        // Discount for registed users
+        if ($screeningId == null) {
+            return redirect()->route('screenings.index')->with('alert-msg', "You must select the screening")->with('alert-type', 'danger');
+        }
+
+        $screening = Screening::findOrFail($screeningId);
+        $seats = Seat::findMany($seatIds);
+
+        $bookedSeats = Ticket::where('screening_id', $screeningId)->whereIn('seat_id', $seatIds)->exists();
+        if ($bookedSeats) {
+            return redirect()->route('screenings.index')->with('alert-msg', 'One or more selected seats are already booked.')->with('alert-type', 'danger');
+        }
+    
+        // Discount for registered users
         $config = Configuration::getSettings();
         if (auth()->check()) {
             $price = $config->ticket_price - $config->customer_ticket_discount;
         } else {
             $price = $config->ticket_price;
         }
-
-        // using make to not save in BD, only creating ref
-        $ticket = Ticket::make([
-            'purchase_id' => null,
-            'screening_id' => $screening->id,
-            'seat_id' => $seat->id,
-            'price' => $price,
-            'status' => 'valid',
-            'qrcode_url' => null
-        ]);
-
-        
-        return $this->addToCart($ticket);
+    
+        $tickets = collect();
+    
+        foreach ($seats as $seat) {
+            $tickets->push(Ticket::make([
+                'purchase_id' => null,
+                'screening_id' => $screening->id,
+                'seat_id' => $seat->id,
+                'price' => $price,
+                'status' => 'valid',
+                'qrcode_url' => null
+            ]));
+        }
+    
+        return $this->addToCart($tickets);
     }
 
-    private function addToCart(Ticket $ticket): RedirectResponse
+    private function addToCart($tickets): RedirectResponse
     {
         $cart = session('cart', null);
 
-        $currentTime = now();
-        // Verifica se o tempo atual é mais do que 5 minutos após o início da sessão
-        $screeningDatetime = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->screening->date . ' ' . $ticket->screening->start_time);
-        if ($screeningDatetime->addMinutes(5)->lt($currentTime)) {
-            return back()->with('alert-msg', 'This screening session has already started more than 5 minutes ago.')
-                         ->with('alert-type', 'danger');
-        }
+        foreach ($tickets as $ticket) {
+            // Verifica se o tempo atual é mais do que 5 minutos após o início da sessão
+            $screeningDatetime = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->screening->date . ' ' . $ticket->screening->start_time);
+            if ($screeningDatetime->addMinutes(5)->lt(now())) {
+                return redirect()->route('screenings.index')->with('alert-msg', 'This screening session has already started more than 5 minutes ago.')
+                                 ->with('alert-type', 'danger');
+            }
 
-        $exists = $cart?->contains(function ($value) use ($ticket) {
-            return $value['screening_id'] == $ticket->screening_id && $value['seat_id'] == $ticket->seat_id;
-        });
-    
-        if (!$cart) {
-            $cart = collect([$ticket]);
-            session()->put('cart', $cart);
-        } else { 
-            if ($exists) {
-                $alertType = 'warning';
-                $htmlMessage = "Ticket <strong>\"{$ticket->screening->movie->title}\"</strong> was not added to the cart because it is already there!";
-                return back()
-                    ->with('alert-msg', $htmlMessage)
-                    ->with('alert-type', $alertType);
-            } else {
-                $cart->push($ticket);
+            $exists = $cart?->contains(function ($value) use ($ticket) {
+                return $value['screening_id'] == $ticket->screening_id && $value['seat_id'] == $ticket->seat_id;
+            });
+            
+            if (!$cart) {
+                $cart = collect([$ticket]);
+                session()->put('cart', $cart);
+            } else { 
+                if ($exists) {
+                    $alertType = 'warning';
+                    $htmlMessage = "Ticket <strong>\"{$ticket->screening->movie->title}\"</strong> was not added to the cart because it is already there!";
+                    return redirect()->route('screenings.index')
+                        ->with('alert-msg', $htmlMessage)
+                        ->with('alert-type', $alertType);
+                } else {
+                    $cart->push($ticket);
+                }
             }
         }
 
         $alertType = 'success';
-        $htmlMessage = "Ticket <strong>\"{$ticket->screening->movie->title}\"</strong> was added to the cart.";
-        return back()
+        $htmlMessage = "Ticket(s) <strong>\"{$tickets->first()->screening->movie->title}\"</strong> were added to the cart.";
+        return redirect()->route('screenings.index')
             ->with('alert-msg', $htmlMessage)
             ->with('alert-type', $alertType);
     }
@@ -145,6 +164,13 @@ class CartController extends Controller
         $this->validateParams($request);
         $paymentResult = $this->processPayment($request->all());
 
+        foreach ($cart as $ticket) 
+        {
+            $bookedSeats = Ticket::where('screening_id', $ticket->screening->id)->where('seat_id', $ticket->seat_id)->exists();
+            if ($bookedSeats) {
+                return back()->with('alert-msg', 'Some seats are already booked, sorry :(')->with('alert-type', 'danger');
+            }
+        }
 
         if ($paymentResult !== false) {
             $purchase = DB::transaction(function () use ($cart, $request) {
@@ -187,8 +213,9 @@ class CartController extends Controller
             } 
             else 
             {
-                return redirect()->route('screenings.index')->with('alert-type', 'success')->with('alert-msg', 'Purchase completed successfully. The receipts was sent to your email.');
+                return redirect()->route('screenings.index')->with('alert-type', 'success')->with('alert-msg', 'Purchase completed successfully. The receipt was sent to your email.');
             }
+
         } else {
             return back()->with('alert-msg', 'Payment failed. Please try again.')->with('alert-type', 'danger');
         }
@@ -245,5 +272,5 @@ class CartController extends Controller
         return back()
             ->with('alert-type', 'success')
             ->with('alert-msg', 'Shopping Cart has been cleared');
-    }
+    }    
 }
