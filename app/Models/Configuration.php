@@ -18,4 +18,9 @@ class Configuration extends Model
         'ticket_price',
         'registered_customer_ticket_discount',
     ];
+
+    public static function getSettings()
+    {
+        return self::first();
+    }
 }
