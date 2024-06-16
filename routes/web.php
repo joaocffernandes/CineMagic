@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ProfileController;
@@ -7,6 +7,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\TheaterController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PurchaseController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use App\Http\Controllers\UserController;
@@ -37,6 +38,20 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])
         ->name('profile.destroy.photo')
         ->middleware('can:crudMy,App\Models\User');;
+
+    Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('tickets/create/', [TicketController::class, 'create'])->name('tickets.create');
+    Route::get('tickets/{ticket}', [TicketController::class, 'showByTicket'])->name('tickets.show');
+    Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
+    Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
+    Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+    Route::get('tickets/{ticket}/receipt/download', [TicketController::class, 'downloadReceipt'])->name('tickets.receipt.download');
+    Route::get('tickets/{ticket}/receipt/show', [TicketController::class, 'showReceipt'])->name('tickets.receipt.show'); // For test
+
+    Route::get('purchase/', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::get('purchase/resend-email/{purchase}', [PurchaseController::class, 'resendEmail'])->name('purchases.resend_email');
+    Route::get('purchase/{purchase}/receipt/download', [PurchaseController::class, 'downloadReceipt'])->name('purchases.receipt.download');
 });
 
 Route::middleware('auth', 'verified', 'can:admin')->group(function () {
@@ -80,20 +95,13 @@ Route::middleware('auth', 'verified', 'can:admin')->group(function () {
     Route::resource('users', UserController::class);
 });
 
-Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
-Route::get('tickets/create', [TicketController::class, 'create'])->name('tickets.create');
-Route::get('tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
-Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
-Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
-Route::post('tickets/add-to-cart', [TicketController::class, 'addToCart'])->name('tickets.add-to-cart');
-Route::get('tickets/checkout', [TicketController::class, 'checkout'])->name('tickets.checkout');
-
-
-Route::post('cart/{ticket}', [CartController::class, 'addToCart'])->name('cart.add');
-Route::delete('cart/{ticket}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::get('cart/createTicketAndAddToCart/{screening}', [CartController::class, 'createTicketAndAddToCart'])->name('cart.createTicketAndAddToCart');
+Route::delete('cart/{screeningId}/{seatId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
 Route::post('cart', [CartController::class, 'confirm'])->name('cart.confirm');
 Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::get('cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
+Route::get('tickets/{screeningId}/{seatId}', [TicketController::class, 'showBySession'])->name('tickets.showBySession');
 Route::get('screenings', [MovieController::class, 'screenings'])->name('screenings.index');
+
