@@ -12,7 +12,7 @@
             <div class="font-base text-sm text-gray-700 dark:text-gray-300">
                 <!-- Aqui você precisa ter um componente de tabela para os tickets no carrinho -->
                 <x-tickets.table :tickets="$cart"
-                    :showView="false"
+                    :showView="true"
                     :showEdit="false"
                     :showDelete="false" 
                     :showAddToCart="false"
@@ -22,9 +22,8 @@
             <div class="mt-12">
                 <div class="flex justify-between space-x-12 items-end">
                     <div>
-                        <form action="{{ route('cart.confirm') }}" method="post">
+                        <form action="{{ route('cart.checkout') }}" method="get">
                             @csrf
-                            <!-- Caso queira adicionar um campo de entrada para informações adicionais -->
                             <x-button element="submit" type="dark" text="Confirm" class="mt-4"/>
                         </form>
                     </div>
