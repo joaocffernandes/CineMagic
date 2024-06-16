@@ -11,7 +11,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts AND CSS Fileds -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/paymentVisa.js'])
 </head>
 
 <body class="font-sans antialiased">
@@ -36,6 +36,12 @@
                         <!-- Menu Item: Courses -->
                         <x-menus.menu-item content="On Screen" href="{{ route('screenings.index') }}" selected="{{ Route::currentRouteName() == 'screenings.index'}}" />
 
+                        <!-- Menu Item: Purchases -->
+                        <x-menus.menu-item content="Purchases" href="{{ route('purchases.index') }}" selected="{{ Route::currentRouteName() == 'purchases.index'}}" />
+
+                        <!-- Menu Item: Tickets -->
+                        <x-menus.menu-item content="Tickets" href="{{ route('tickets.index') }}" selected="{{ Route::currentRouteName() == 'tickets.index'}}" />
+                            
                         @auth
                         @if(Auth::user()->type == 'A')
                         <!-- Menu Item: Others -->
