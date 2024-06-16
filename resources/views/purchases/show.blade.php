@@ -38,18 +38,22 @@
                     @foreach ($purchase->tickets as $ticket)
                         <li>
                             Movie: <strong>{{ $ticket->screening->movie->title }}</strong> - Seat: <strong>{{ $ticket->seat->row . $ticket->seat->seat_number }}</strong> on Date: <strong>{{ $ticket->screening->date }}</strong>
-                            - <a href="{{ route('tickets.show', $ticket->id) }}" class="text-blue-500 hover:text-blue-700">View Details</a>
+                            @if(Auth::check())
+                                - <a href="{{ route('tickets.show', $ticket->id) }}" class="text-blue-500 hover:text-blue-700">View Details</a>
+                            @endif
                         </li>
                     @endforeach
                 </ul>
                 <!-- Botão para ver todos os tickets desta compra -->
                 <div class="flex justify-between">
-                    <div class="mt-4">
-                        <x-button href="{{ route('tickets.index', ['purchase' => $purchase->id]) }}" text="View Tickets" type="dark" />
-                    </div>
-                    <div class="mt-4">
-                        <x-button href="{{ route('purchases.receipt.download', $purchase->id) }}" text="Download Receipt" type="primary" class="text-indigo-600 hover:text-indigo-900"/>
-                    </div>
+                    @if (Auth::check())
+                        <div class="mt-4">
+                            <x-button href="{{ route('tickets.index', ['purchase' => $purchase->id]) }}" text="View Tickets" type="dark" />
+                        </div>
+                        <div class="mt-4">
+                            <x-button href="{{ route('purchases.receipt.download', $purchase->id) }}" text="Download Receipt" type="primary" class="text-indigo-600 hover:text-indigo-900"/>
+                        </div>
+                    @endif
 
                     @if(Auth::user()?->type == 'E' || Auth::user()?->type == 'A')
                         <div class="mt-4">
