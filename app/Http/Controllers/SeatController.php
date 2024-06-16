@@ -29,22 +29,4 @@ class SeatController extends Controller
 
         return view('seats.show', compact('screening', 'quantTickets', 'seatsDisabledList'));
     }
-
-    public function reserve(Request $request, $screeningId)
-    {
-        $selectedSeats = $request->input('seats');
-        $screening = Screening::with('theater.seats')->findOrFail($screeningId);
-
-        // Processar reserva
-        foreach ($selectedSeats as $seatId) {
-            $seat = Seat::find($seatId);
-            if ($seat->status == 'available') {
-                $seat->status = 'reserved';
-                $seat->save();
-            }
-        }
-
-        return redirect()->route('seats.show', ['screening' => $screeningId])
-                         ->with('success', 'Seats reserved successfully!');
-    }
 }
