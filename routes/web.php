@@ -40,19 +40,7 @@ Route::middleware('auth', 'verified')->group(function () {
         ->name('profile.destroy.photo')
         ->middleware('can:crudMy,App\Models\User');;
 
-    Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
-    Route::get('tickets/create/', [TicketController::class, 'create'])->name('tickets.create');
-    Route::get('tickets/{ticket}', [TicketController::class, 'showByTicket'])->name('tickets.show');
-    Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
-    Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
-    Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
-    Route::get('tickets/{ticket}/receipt/download', [TicketController::class, 'downloadReceipt'])->name('tickets.receipt.download');
-    Route::get('tickets/{ticket}/receipt/show', [TicketController::class, 'showReceipt'])->name('tickets.receipt.show'); // For test
-
-    Route::get('purchase/', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::get('purchase/resend-email/{purchase}', [PurchaseController::class, 'resendEmail'])->name('purchases.resend_email');
-    Route::get('purchase/{purchase}/receipt/download', [PurchaseController::class, 'downloadReceipt'])->name('purchases.receipt.download');
+    
 });
 
 Route::middleware('auth', 'verified', 'can:admin')->group(function () {
@@ -96,6 +84,22 @@ Route::middleware('auth', 'verified', 'can:admin')->group(function () {
     Route::resource('users', UserController::class);
 
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+});
+
+Route::middleware('auth', 'verified', 'can:employee')->group(function () {
+    Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('tickets/create/', [TicketController::class, 'create'])->name('tickets.create');
+    Route::get('tickets/{ticket}', [TicketController::class, 'showByTicket'])->name('tickets.show');
+    Route::get('tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
+    Route::put('tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
+    Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+    Route::get('tickets/{ticket}/receipt/download', [TicketController::class, 'downloadReceipt'])->name('tickets.receipt.download');
+    Route::get('tickets/{ticket}/receipt/show', [TicketController::class, 'showReceipt'])->name('tickets.receipt.show'); // For test
+
+    Route::get('purchase/', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::get('purchase/resend-email/{purchase}', [PurchaseController::class, 'resendEmail'])->name('purchases.resend_email');
+    Route::get('purchase/{purchase}/receipt/download', [PurchaseController::class, 'downloadReceipt'])->name('purchases.receipt.download');
 });
 
 Route::get('seats/reserve/{screening}/{quantTickets}', [SeatController::class, 'show'])->name('seats.reserve');
