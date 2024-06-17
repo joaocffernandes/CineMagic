@@ -27,5 +27,10 @@ class AppServiceProvider extends ServiceProvider
             // Apenas usuários do tipo "A" podem acessar recursos de administrador
             return $user->type == 'A';
         });
+
+        Gate::define('employee', function (User $user) {
+            // Apenas usuários do tipo "A" podem acessar recursos de administrador
+            return $user->type != 'E';
+        });
     }
 }

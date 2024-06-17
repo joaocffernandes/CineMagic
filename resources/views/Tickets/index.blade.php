@@ -28,8 +28,8 @@
             <div class="font-base text-sm text-gray-700 dark:text-gray-300">
             <x-tickets.table :tickets="$tickets"
                 :showView="true"
-                :showEdit="Auth::check() && Auth::user()->type != 'C'"
-                :showDelete="Auth::check() && Auth::user()->type != 'C'"
+                :showEdit="false"
+                :showDelete="false"
                 :showAddToCart="false"
                 :showRemoveFromCart="false"
             />
